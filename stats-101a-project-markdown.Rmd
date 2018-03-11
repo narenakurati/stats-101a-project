@@ -6,5 +6,51 @@ output: pdf_document
 ---
 
 ````{r}
-#Initial commit
+#data cleanup
+happiness_data <- read.table("Happiness.txt", header = TRUE)
+head(happiness_data)
+
+happiness_data$Household[happiness_data$Household == 8 | happiness_data$Household == 9] <- NA
+
+happiness_data$Health[happiness_data$Health == 8 | happiness_data$Health == 9 |  happiness_data$Health == 0] <- NA
+happiness_data$Health[happiness_data$Health == 1] <- 400
+happiness_data$Health[happiness_data$Health == 2] <- 300
+happiness_data$Health[happiness_data$Health == 3] <- 2
+happiness_data$Health[happiness_data$Health == 4] <- 1
+happiness_data$Health[happiness_data$Health == 400] <- 4
+happiness_data$Health[happiness_data$Health == 300] <- 3
+
+happiness_data$OwnHome[happiness_data$OwnHome == 0 | happiness_data$OwnHome == 8 | happiness_data$OwnHome == 9] <- NA
+
+happiness_data$Instagram[happiness_data$Instagram == 0 | happiness_data$Instagram == 8 | happiness_data$Instagram == 9] <- NA
+
+happiness_data$Marital[happiness_data$Marital == 9] <- NA
+
+happiness_data$Age[happiness_data$Age == 89 | happiness_data$Age == 98 | happiness_data$Age == 99] <- NA
+
+happiness_data$Children[happiness_data$Children == 8 | happiness_data$Children == 9] <- NA
+
+happiness_data$Education[happiness_data$Education == 97 | happiness_data$Education == 98 | happiness_data$Education == 99] <- NA
+
+happiness_data$JobSat[happiness_data$JobSat == 0 | happiness_data$JobSat == 8 | happiness_data$JobSat == 9] <- NA
+
+happiness_data$Income[happiness_data$Income == 0 | happiness_data$Income == 999998 | happiness_data$Income == 999999] <- NA
+
+happiness_data$WorkHrs[happiness_data$WorkHrs == -1 | happiness_data$WorkHrs == 998 | happiness_data$WorkHrs == 999] <- NA
+
+happiness_data$Happy[happiness_data$Happy == 0 | happiness_data$Happy == 8 | happiness_data$Happy == 9] <- NA
+
+happiness_data$Happy[happiness_data$Happy == 1] <- 100
+happiness_data$Happy[happiness_data$Happy == 3] <- 1
+happiness_data$Happy[happiness_data$Happy == 100] <- 3
+
+pairs(happiness_data[, -c(1,2,3,4,5,6,8,10)], gap=0.4,cex.labels=1.5)
+
+m1 <- lm(happiness_data$Happy ~ happiness_data$Age + happiness_data$Education + happiness_data$Income + happiness_data$WorkHrs)
+
+summary(m1)
+
+m2 <- lm(happiness_data$Happy ~ happiness_data$Income)
+plot(happiness_data$Happy ~ happiness_data$Income)
+summary(m2)
 ````
