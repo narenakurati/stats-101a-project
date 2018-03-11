@@ -1,0 +1,10 @@
+---
+title: "stats-101a-project-markdown"
+author: "Naren Akurati"
+date: "3/11/2018"
+output: pdf_document
+---
+
+````{r}
+#Initial commit
+````
