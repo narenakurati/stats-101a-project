@@ -5,7 +5,7 @@ date: "3/11/2018"
 output: pdf_document
 ---
 
-````{r}
+```{r}
 #data cleanup
 happiness_data <- read.table("Happiness.txt", header = TRUE)
 head(happiness_data)
@@ -77,8 +77,8 @@ summary(m6)
 inverse_income <- 1/(happiness_data$Income)
 m7 <- lm(happiness_data$Happy ~ inverse_income)
 summary(m7)
-````
+```
 
 ```{r}
-summary(lm(happiness_data$Happy ~ factor(happiness_data$JobSat) + factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital)))
+summary(lm(happiness_data$Happy ~ factor(happiness_data$JobSat) + factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income))
 ```
