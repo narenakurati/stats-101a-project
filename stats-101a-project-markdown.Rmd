@@ -44,6 +44,7 @@ happiness_data$Happy[happiness_data$Happy == 1] <- 100
 happiness_data$Happy[happiness_data$Happy == 3] <- 1
 happiness_data$Happy[happiness_data$Happy == 100] <- 3
 
+#exploring data
 pairs(happiness_data[, -c(1,2,3,4,5,6,8,10)], gap=0.4,cex.labels=1.5)
 
 m1 <- lm(happiness_data$Happy ~ happiness_data$Age + happiness_data$Education + happiness_data$Income + happiness_data$WorkHrs)
@@ -53,4 +54,17 @@ summary(m1)
 m2 <- lm(happiness_data$Happy ~ happiness_data$Income)
 plot(happiness_data$Happy ~ happiness_data$Income)
 summary(m2)
+
+#adding factors/levels
+HappyCat <- factor(happiness_data$Happy)
+levels(HappyCat)
+
+m4 <- lm(HappyCat ~ happiness_data$Income)
+#summary(m4)
+plot(HappyCat ~ happiness_data$Income)
+
+m5 <- lm(happiness_data$Income ~ HappyCat)
+summary(m5)
+plot(happiness_data$Income ~ HappyCat)
+
 ````
