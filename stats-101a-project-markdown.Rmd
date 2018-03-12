@@ -87,5 +87,8 @@ inverse.response.plot(m1,key=TRUE)
 
 m2 <- lm((happiness_data$Happy)^0.396 ~ factor(happiness_data$JobSat) + factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
 summary(m2)
+```
 
+```{r}
+plot(happiness_data$Happy ~ factor(happiness_data$Children))
 ```
