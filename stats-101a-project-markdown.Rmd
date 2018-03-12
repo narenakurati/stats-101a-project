@@ -59,12 +59,22 @@ summary(m2)
 HappyCat <- factor(happiness_data$Happy)
 levels(HappyCat)
 
-m4 <- lm(HappyCat ~ happiness_data$Income)
+#m4 <- lm(HappyCat ~ happiness_data$Income)
 #summary(m4)
-plot(HappyCat ~ happiness_data$Income)
+#plot(HappyCat ~ happiness_data$Income)
 
-m5 <- lm(happiness_data$Income ~ HappyCat)
-summary(m5)
-plot(happiness_data$Income ~ HappyCat)
+#m5 <- lm(happiness_data$Income ~ HappyCat)
+#summary(m5)
+#plot(happiness_data$Income ~ HappyCat)
 
+#transforming linear income
+mean_income <- mean(happiness_data$Income, na.rm=TRUE)
+tIncome <- happiness_data$Income/mean_income
+m6 <- lm(happiness_data$Happy ~ tIncome)
+summary(m6)
+
+#transforming inverse income
+inverse_income <- 1/(happiness_data$Income)
+m7 <- lm(happiness_data$Happy ~ inverse_income)
+summary(m7)
 ````
