@@ -94,6 +94,8 @@ plot(m2)
 anova(m2)
 
 ```
+
+
 ```{r}
-table(is.na(happiness_data$WorkHrs))
+plot(happiness_data$Happy ~ factor(happiness_data$Children))
 ```
