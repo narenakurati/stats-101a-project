@@ -78,3 +78,7 @@ inverse_income <- 1/(happiness_data$Income)
 m7 <- lm(happiness_data$Happy ~ inverse_income)
 summary(m7)
 ````
+
+```{r}
+summary(lm(happiness_data$Happy ~ factor(happiness_data$JobSat) + factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital)))
+```
