@@ -97,5 +97,30 @@ anova(m2)
 
 
 ```{r}
-plot(happiness_data$Happy ~ factor(happiness_data$Children))
+#testing the significance of Children predictor variable
+plot(happiness_data$Happy ~ happiness_data$Children)
+m8 <- lm(happiness_data$Happy ~ happiness_data$Children)
+summary(m8)
+#it seems children and happiness have almost no correlation. we might be able to remove this one
+
+#testing the significance of Education predictor variable
+m9 <- lm(happiness_data$Happy ~ happiness_data$Education)
+summary(m9)
+plot(m9)
+plot(happiness_data$Happy ~ factor(happiness_data$Education))
+#judging from the linearity of the residuals plot, it does not seem education needs a transformation
+
+#ignore below
+  # inverseEducation <- 1/(happiness_data$Education)
+  # inverseEducation[which(is.nan(inverseEducation))] = NA
+  # inverseEducation[which(inverseEducation==Inf)] = NA
+  # m9 <- lm(happiness_data$Happy ~ inverseEducation)
+  # summary(m9)
+  
+  # inverseLogEducation <- (happiness_data$Education)^0.25
+  # inverseLogEducation[which(is.nan(inverseLogEducation))] = NA
+  # inverseLogEducation[which(inverseLogEducation==Inf)] = NA
+  # m10 <- lm(happiness_data$Happy ~ inverseLogEducation)
+  # summary(m10)
+  # plot(m10)
 ```
