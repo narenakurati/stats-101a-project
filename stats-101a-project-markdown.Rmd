@@ -97,6 +97,7 @@ anova(m2)
 
 
 ```{r}
+#naren
 #testing the significance of Children predictor variable
 plot(happiness_data$Happy ~ happiness_data$Children)
 m8 <- lm(happiness_data$Happy ~ happiness_data$Children)
