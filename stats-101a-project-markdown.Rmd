@@ -82,11 +82,10 @@ summary(m7)
 ```
 
 ```{r}
-#simran's model using invser response plot
+#simran's model using invserse response plot
 library(alr3)
 m1 <- lm(happiness_data$Happy ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
 inverse.response.plot(m1,key=TRUE)
-
 
 m2 <- lm((happiness_data$Happy)^0.396 ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
 summary(m2)
@@ -96,7 +95,6 @@ plot(m2)
 
 anova(m2)
 ```
-
 
 ```{r}
 #naren
@@ -127,3 +125,19 @@ plot(happiness_data$Happy ~ factor(happiness_data$Education))
   # summary(m10)
   # plot(m10)
 ```
+
+```{r}
+#naren exploring full model with individual changes to variables and subsequent new models
+m10 <- lm(happiness_data$Happy ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
+summary(m10)
+
+#removing Children and Instagram 
+m11 <- lm(happiness_data$Happy ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + factor(happiness_data$Marital) + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
+summary(m11)
+inverse.response.plot(m11,key=TRUE)
+
+#adding in inverse response plot lambda
+m12 <- lm((happiness_data$Happy)^-0.1058152 ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + factor(happiness_data$Marital) + happiness_data$Education + factor(happiness_data$JobSat) + log(happiness_data$Income))
+summary(m12)
+```
+
