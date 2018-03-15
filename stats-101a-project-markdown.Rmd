@@ -43,9 +43,9 @@ happiness_data$Happy[happiness_data$Happy == 0 | happiness_data$Happy == 8 | hap
 happiness_data$Happy[happiness_data$Happy == 1] <- 100
 happiness_data$Happy[happiness_data$Happy == 3] <- 1
 happiness_data$Happy[happiness_data$Happy == 100] <- 3
-````
+```
 
-````{r}
+```{r}
 #exploring data
 pairs(happiness_data[, -c(1,2,3,4,5,6,8,10)], gap=0.4,cex.labels=1.5)
 
@@ -82,6 +82,7 @@ summary(m7)
 ```
 
 ```{r}
+#simran's model using invser response plot
 library(alr3)
 m1 <- lm(happiness_data$Happy ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
 inverse.response.plot(m1,key=TRUE)
@@ -94,7 +95,6 @@ par(mfrow=c(2,2))
 plot(m2)
 
 anova(m2)
-
 ```
 
 
