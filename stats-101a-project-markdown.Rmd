@@ -43,7 +43,9 @@ happiness_data$Happy[happiness_data$Happy == 0 | happiness_data$Happy == 8 | hap
 happiness_data$Happy[happiness_data$Happy == 1] <- 100
 happiness_data$Happy[happiness_data$Happy == 3] <- 1
 happiness_data$Happy[happiness_data$Happy == 100] <- 3
+````
 
+````{r}
 #exploring data
 pairs(happiness_data[, -c(1,2,3,4,5,6,8,10)], gap=0.4,cex.labels=1.5)
 
