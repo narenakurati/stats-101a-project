@@ -127,3 +127,7 @@ plot(happiness_data$Happy ~ factor(happiness_data$Education))
   # summary(m10)
   # plot(m10)
 ```
+
+```{r}
+#jeremy first commit
+```
