@@ -8,7 +8,7 @@ output:
 ---
 
 We began by systematically cleaning the data. For each variable, our first step was consulting the codebook to decide which codes could be converted to NAs. We decided that "not answered" could in every case be classified as NA. However, we were less sure about "Don't know" and "Inapplicable", but in our first iteration of data cleaning, we converted those to NAs too in order to simplify the task at hand and move on to exploratory analysis. We also converted the variables coded to denote "_ or more" to NAs as we felt those might skew our analysis.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
 #data cleanup
 happiness_data <- read.table("Happiness.txt", header = TRUE)
 
@@ -48,7 +48,7 @@ happiness_data$Happy[happiness_data$Happy == 100] <- 3
 ```
 
 In exploring the data, we began with a scatterplot, which was not at all informative. We then split the variables into numerical and categorical and decided to analyze each group separately. Our numerical variables were Age, Education, Income and WorkHrs; we considered the rest as categorical and converted them into factors in order to build models with them. We put all our numerical variables into a model with Happy, obtaining an unsatisfactory R squared value of 0.017. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
 #exploring data
 pairs(happiness_data[, -c(1,2,3,4,5,6,8,10)], gap=0.4,cex.labels=1.5)
 m1 <- lm(happiness_data$Happy ~ happiness_data$Age + happiness_data$Education + happiness_data$Income + happiness_data$WorkHrs)
@@ -56,7 +56,7 @@ summary(m1)
 ```
 
 Then, we created a model with all predictors against Happy, with the categorical variables in factor form. We used an inverse response plot on the model, just to see how high of an R squared value we could get to obtain an estimate of what to aim for. This gave us an R squared value of around 0.303, probably from overfitting; the adjusted R squared was 0.2235. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
 library(alr3)
 m1 <- lm(happiness_data$Happy ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
 inverse.response.plot(m1,key=TRUE)
@@ -66,7 +66,7 @@ summary(m2)
 ```
 
 At this stage, after getting comfortable with the data, we decided to make some modifications to how we selected codes to turn into NAs; we did not convert 8 (8 or more) in Household or Children, and we converted 0 (Inapplicable) and 8 (Don't know) to 2 (No) in Instagram. With these new conditions, we repeated plotting the full model, carrying out more complete analyses on it this time. Its R squared value was 0.2811, with an adjusted R squared of 0.2069.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), include = FALSE}
 #data cleanup
 getwd()
 happiness_data <- read.table("Happiness.txt", header = TRUE)
@@ -134,7 +134,7 @@ sum(is.na(happiness_data$WorkHrs))
 ```
 
 We plotted the full model (without WorkHrs). This factored in around 190 observations, as the rest had NAs under some variables. We found the Residuals vs Fitted plot showed a decreasing linear trend, a result of some of the predictor variables being categorical. The standardized residual plot also showed a pattern that skewed the plot much more than it did in the Residuals vs. Fitted plot. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
 attach(happiness_data)
 #Factoring Categorical Variables
 JobSat.f <- factor(JobSat)
@@ -152,7 +152,7 @@ summary(full_model)
 ```
 
 We decided the best way to proceed would be to test each variable's significance individually. We correlated individual variables with Happy, finding that Instagram and Sex did not have statistically significant linear relationships to Happy.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
 insta <- lm(Happy ~ Instagram)
 summary(insta)
 plot(insta)
@@ -180,7 +180,7 @@ plot(sex)
 ```
 
 We then used partial F-tests to verify these findings, as well as potentially weed out other variables. To do so, we created models that each excluded one variable and then tested them against our full model. This method found Children and Education to be insignificant in addition to Instagram and Sex. OwnHome, JobSat, Income and Age threw errors in partial F-testing.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), include = FALSE}
 noMarital <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Education + Age + Income + Children + Instagram.f)
 anova(full_model, noMarital)
 #Marital is Significant
@@ -227,7 +227,7 @@ names(happiness_data)
 
 
 After eliminating the four insignificant variables, we obtained AIC, AICc and BIC values, which were lowest when all six variables were included. Performing forward selection showed OwnHome to be insignificant and performing backward selection showed Age to be insignificant. Since the forward and backward selections were not in agreement, this did not seem like strong enough evidence to exclude the variables to us. We found including all 6 variables gave us the lowest values for each, so we did not choose to omit any variables from the model in this process. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
 #Eliminating education, instagram, children, sex
 new_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Income + Age)
 summary(new_model)
