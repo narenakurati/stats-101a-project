@@ -290,11 +290,14 @@ inverseResponsePlot(Final_model)
 
 Age_transformed <- Age^0.226
 
-m_new <- lm(Happy^-0.1130549 ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
-m_new_log <- lm(log(Happy) ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
+m_new <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
+
 inverseResponsePlot(m_new, key=TRUE)
+
+m_new <- lm(Happy^-0.1130549 ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
+
 summary(m_new)
-summary(m_new_log)
 
 plot(m_new)
-plot(m_new_log)
+
+vif(m_new)
