@@ -336,7 +336,7 @@ Final_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household.f + Incom
 summary(Final_model)
 ```
 
-We used both the Box Cox and inverse response plot methods in transforming our model. Per Box Cox, we raised Age to the power of 0.226. Intuitively, looking at the relationship between Income and Happy, we decided on a logarithmic transformation on Income, as well. The adjusted R squared value reduced a little from this transformation, to 0.2099, and R squared dropped to 0.2838. Taking into account the inverse response plot function's suggestion - raising Happy to the power of -0.1130549 - improved the model a good amount - we obtained a value of 0.3116 for R squared and 0.2405 for adjusted R squared.
+We used both the Box Cox and inverse response plot methods in transforming our model. Per Box Cox, we raised Age to the power of 0.226. Intuitively, looking at the relationship between Income and Happy, we decided on a logarithmic transformation on Income, as well. The adjusted R squared value reduced a little from this transformation, to 0.2099, and R squared dropped to 0.2838. The inverse response plot suggested a lambda of -0.1130549, but the RSS for a lambda of 0 was very similar, so we took the log transformation of our response variable instead, as it it represented a better representation of real world data. We ended with an $R^2$ value of 0.3092 and an adjusted $R^2$ of 0.2378.
 ````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #Box Cox transformation
 summary(powerTransform(cbind(JobSat.f, OwnHome.f, Marital.f, Household.f, Income, Age)~1))
@@ -348,7 +348,7 @@ summary(m_new)
 #Inverse response plot
 inverseResponsePlot(m_new, key=TRUE)
 
-m_new <- lm(Happy^-0.1130549 ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
+m_new <- lm(log(Happy) ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
 
 summary(m_new)
 ```
