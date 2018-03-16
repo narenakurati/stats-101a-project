@@ -1,0 +1,372 @@
+---
+title: 'Stats 101A project: final first draft'
+author: "Simran Vatsa"
+date: "3/15/2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+We began by systematically cleaning the data. For each variable, our first step was consulting the codebook to decide which codes could be converted to NAs. We decided that "not answered" could in every case be classified as NA. However, we were less sure about "Don't know" and "Inapplicable", but in our first iteration of data cleaning, we converted those to NAs too in order to simplify the task at hand and move on to exploratory analysis. We also converted the variables coded to denote "_ or more" to NAs as we felt those might skew our analysis.
+```{r}
+#data cleanup
+happiness_data <- read.table("Happiness.txt", header = TRUE)
+head(happiness_data)
+
+happiness_data$Household[happiness_data$Household == 8 | happiness_data$Household == 9] <- NA
+
+happiness_data$Health[happiness_data$Health == 8 | happiness_data$Health == 9 |  happiness_data$Health == 0] <- NA
+happiness_data$Health[happiness_data$Health == 1] <- 400
+happiness_data$Health[happiness_data$Health == 2] <- 300
+happiness_data$Health[happiness_data$Health == 3] <- 2
+happiness_data$Health[happiness_data$Health == 4] <- 1
+happiness_data$Health[happiness_data$Health == 400] <- 4
+happiness_data$Health[happiness_data$Health == 300] <- 3
+
+happiness_data$OwnHome[happiness_data$OwnHome == 0 | happiness_data$OwnHome == 8 | happiness_data$OwnHome == 9] <- NA
+
+happiness_data$Instagram[happiness_data$Instagram == 0 | happiness_data$Instagram == 8 | happiness_data$Instagram == 9] <- NA
+
+happiness_data$Marital[happiness_data$Marital == 9] <- NA
+
+happiness_data$Age[happiness_data$Age == 89 | happiness_data$Age == 98 | happiness_data$Age == 99] <- NA
+
+happiness_data$Children[happiness_data$Children == 8 | happiness_data$Children == 9] <- NA
+
+happiness_data$Education[happiness_data$Education == 97 | happiness_data$Education == 98 | happiness_data$Education == 99] <- NA
+
+happiness_data$JobSat[happiness_data$JobSat == 0 | happiness_data$JobSat == 8 | happiness_data$JobSat == 9] <- NA
+
+happiness_data$Income[happiness_data$Income == 0 | happiness_data$Income == 999998 | happiness_data$Income == 999999] <- NA
+
+happiness_data$WorkHrs[happiness_data$WorkHrs == -1 | happiness_data$WorkHrs == 998 | happiness_data$WorkHrs == 999] <- NA
+
+happiness_data$Happy[happiness_data$Happy == 0 | happiness_data$Happy == 8 | happiness_data$Happy == 9] <- NA
+
+happiness_data$Happy[happiness_data$Happy == 1] <- 100
+happiness_data$Happy[happiness_data$Happy == 3] <- 1
+happiness_data$Happy[happiness_data$Happy == 100] <- 3
+```
+
+In exploring the data, we began with a scatterplot, which was not at all informative. We then split the variables into numerical and categorical and decided to analyze each group separately. Our numerical variables were Age, Education, Income and WorkHrs; we considered the rest as categorical and converted them into factors in order to build models with them. We put all our numerical variables into a model with Happy, obtaining an unsatisfactory R squared value of 0.017. 
+```{r}
+#exploring data
+pairs(happiness_data[, -c(1,2,3,4,5,6,8,10)], gap=0.4,cex.labels=1.5)
+
+m1 <- lm(happiness_data$Happy ~ happiness_data$Age + happiness_data$Education + happiness_data$Income + happiness_data$WorkHrs)
+
+summary(m1)
+```
+
+Then, we created a model with all predictors against Happy, with the categorical variables in factor form. We used an inverse response plot on the model, just to see how high of an R squared value we could get to obtain an estimate of what to aim for. This gave us an R squared value of around 0.303, probably from overfitting; the adjusted R squared was 0.2235. 
+```{r}
+library(alr3)
+m1 <- lm(happiness_data$Happy ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
+inverse.response.plot(m1,key=TRUE)
+
+m2 <- lm((happiness_data$Happy)^0.396 ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
+summary(m2)
+```
+
+At this stage, after getting comfortable with the data, we decided to make some modifications to how we selected codes to turn into NAs; we did not convert 8 (8 or more) in Household or Children, and we converted 0 (Inapplicable) and 8 (Don't know) to 2 (No) in Instagram. With these new conditions, we repeated plotting the full model, carrying out more complete analyses on it this time. Its R squared value was 0.2811, with an adjusted R squared of 0.2069.
+```{r}
+#data cleanup
+getwd()
+happiness_data <- read.table("Happiness.txt", header = TRUE)
+head(happiness_data)
+
+#Household
+happiness_data$Household[happiness_data$Household == 9] <- NA
+
+#Health
+happiness_data$Health[happiness_data$Health == 8 | happiness_data$Health == 9 |  happiness_data$Health == 0] <- NA
+happiness_data$Health[happiness_data$Health == 1] <- 400
+happiness_data$Health[happiness_data$Health == 2] <- 300
+happiness_data$Health[happiness_data$Health == 3] <- 2
+happiness_data$Health[happiness_data$Health == 4] <- 1
+happiness_data$Health[happiness_data$Health == 400] <- 4
+happiness_data$Health[happiness_data$Health == 300] <- 3
+
+#OwnHome
+happiness_data$OwnHome[happiness_data$OwnHome == 0 | happiness_data$OwnHome == 8 | happiness_data$OwnHome == 9] <- NA
+
+#Instagram - Set 'don't know' and 'inapplicable' to 'No'
+happiness_data$Instagram[happiness_data$Instagram == 0 | happiness_data$Instagram == 8] <- 2
+happiness_data$Instagram[happiness_data$Instagram == 9] <- NA
+
+#Marital
+happiness_data$Marital[happiness_data$Marital == 9] <- NA
+
+#Age
+happiness_data$Age[happiness_data$Age == 89 | happiness_data$Age == 98 | happiness_data$Age == 99] <- NA
+
+#Children
+happiness_data$Children[happiness_data$Children == 9] <- NA
+
+#Education
+happiness_data$Education[happiness_data$Education == 97 | happiness_data$Education == 98 | happiness_data$Education == 99] <- NA
+
+#JobSat
+happiness_data$JobSat[happiness_data$JobSat == 0 | happiness_data$JobSat == 8 | happiness_data$JobSat == 9] <- NA
+
+#Income
+happiness_data$Income[happiness_data$Income == 0 | happiness_data$Income == 999998 | happiness_data$Income == 999999] <- NA
+
+#WorkHrs
+happiness_data$WorkHrs[happiness_data$WorkHrs == -1 | happiness_data$WorkHrs == 998 | happiness_data$WorkHrs == 999] <- NA
+
+#Happy
+happiness_data$Happy[happiness_data$Happy == 0 | happiness_data$Happy == 8 | happiness_data$Happy == 9] <- NA
+happiness_data$Happy[happiness_data$Happy == 1] <- 100
+happiness_data$Happy[happiness_data$Happy == 3] <- 1
+happiness_data$Happy[happiness_data$Happy == 100] <- 3
+```
+
+
+The first conclusion we came to in our model selection process was that WorkHrs could be excluded, as there were 1898 missing values, most of which were -1 (Inapplicable). While we weren't sure whether "Inapplicable" could be considered a missing value per se, there did not seem to be any way around categorizing it so, since we had decided to treat WorkHrs as a numerical variable. Its sheer amount of missing values made it ineligible for model fitting - every attempt to include it resulted in an error being thrown. 
+```{r}
+#Finding the number of NAs 
+sum(is.na(happiness_data$WorkHrs))
+#Insta = 10, Marital = 1
+#Household = 1
+#Health = 811
+#OwnHome = 812
+#JobSat = 1612 
+#WorkHrs = 1898 
+#Income = 1039
+```
+
+We plotted the full model (without WorkHrs). This factored in around 190 observations, as the rest had NAs under some variables. We found the Residuals vs Fitted plot showed a decreasing linear trend, a result of some of the predictor variables being categorical. The standardized residual plot also showed a pattern that skewed the plot much more than it did in the Residuals vs. Fitted plot. 
+```{r}
+attach(happiness_data)
+#Factoring Categorical Variables
+JobSat.f <- factor(JobSat)
+OwnHome.f <- factor(OwnHome)
+Marital.f <- factor(Marital)
+Instagram.f <- factor(Instagram)
+Health.f <- factor(Health)
+
+attach(happiness_data)
+
+library(alr3)
+#Couldn't include Health as it throws an error
+full_model <- lm(Happy ~ Household + OwnHome.f + Instagram.f + Marital.f + Children + Education + JobSat.f + Income + Age + Sex )
+summary(full_model)
+
+par(mfrow = c(2,2))
+plot(full_model)
+```
+
+We decided the best way to proceed would be to test each variable's significance individually. We correlated individual variables with Happy, finding that Instagram and Sex did not have statistically significant linear relationships to Happy.
+```{r}
+insta <- lm(Happy ~ Instagram)
+summary(insta)
+plot(insta)
+#Instagram is insignificant
+
+marital <- lm(Happy ~ Marital.f)
+summary(marital)
+plot(marital)
+#Marital is significant
+
+Job <- lm(Happy ~ JobSat.f)
+summary(Job)
+plot(Job)
+#Job is significant
+
+House <- lm(happiness_data$Happy ~ happiness_data$Household)
+summary(House)
+plot(Household)
+#Household is significant
+
+sex <- lm(Happy ~ Sex)
+summary(sex)
+plot(sex)
+#Sex is insignificant
+```
+
+We then used partial F-tests to verify these findings, as well as potentially weed out other variables. To do so, we created models that each excluded one variable and then tested them against our full model. This method found Children and Education to be insignificant in addition to Instagram and Sex. OwnHome, JobSat, Income and Age threw errors in partial F-testing.
+```{r}
+noMarital <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Education + Age + Income + Children + Instagram.f)
+anova(full_model, noMarital)
+#Marital is Significant
+plot(noMarital)
+
+noHousehold <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Marital.f + Education + Age + Income + Children + Instagram.f)
+anova(full_model, noHousehold)
+#Household is significant
+
+noSex <- lm(Happy ~ JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Children + Instagram.f)
+anova(full_model, noSex)
+#Sex is insignificant
+
+noInstagram <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Children)
+anova(full_model, noInstagram)
+#Instagram is insignificant
+plot(noInstagram)
+
+noChildren <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Instagram.f)
+anova(full_model, noChildren)
+#Children is Insignificant
+
+noEducation <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Age + Income + Children + Instagram.f)
+anova(full_model, noEducation)
+#Education is insignificant
+
+#noOwnHome <- lm(Happy ~ Sex + JobSat.f + Household + Marital.f + Education + Age + Income + Children + Instagram.f)
+#anova(full_model, noOwnHome)
+#OwnHome Error
+
+#noJobSat <- lm(Happy ~ Sex + OwnHome.f + Household + Marital.f + Education + Age + Income + Children + Instagram.f)
+#anova(full_model, noJobSat)
+#JobSat Error
+names(happiness_data)
+
+#noAge <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Education  + Income + Children + Instagram.f)
+#anova(full_model, noAge)
+#Age Error
+
+#noIncome <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Children + Instagram.f)
+#anova(full_model, noIncome)
+#Income Error
+```
+
+
+After eliminating the four insignificant variables, we obtained AIC, AICc and BIC values, which were lowest when all six variables were included. Performing forward selection showed OwnHome to be insignificant and performing backward selection showed Age to be insignificant. Since the forward and backward selections were not in agreement, this did not seem like strong enough evidence to exclude the variables to us. We found including all 6 variables gave us the lowest values for each, so we did not choose to omit any variables from the model in this process. 
+```{r}
+#Eliminating education, instagram, children, sex
+new_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Income + Age)
+summary(new_model)
+plot(new_model)
+Rad <- summary(new_model)$adj.r.squared
+Rad
+
+om1 <- lm(Happy ~ JobSat.f)
+om2 <- lm(Happy ~ JobSat.f + OwnHome.f)
+om3 <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f)
+om4 <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household)
+om5 <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Age)
+om6 <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income)
+n = length(Happy)
+
+
+#### subset size = 1 ####
+p <- 1
+oms1 <- summary(om1)
+# AIC
+AIC1 <- extractAIC(om1,k=2)[2]
+# AICc
+AICc1 <- extractAIC(om1,k=2)[2]+2*(p+2)*(p+3)/(n-p-1)
+# BIC
+BIC1 <- extractAIC(om1,k=log(n))[2]
+
+#### subset size = 2 ####
+p <- 2
+oms2 <- summary(om2)
+# AIC
+AIC2 <- extractAIC(om2,k=2)[2]
+# AICc
+AICc2 <- extractAIC(om2,k=2)[2]+2*(p+2)*(p+3)/(n-p-1)
+# BIC
+BIC2 <- extractAIC(om2,k=log(n))[2]
+
+#### subset size = 3 ####
+p <- 3
+oms3 <- summary(om3)
+# AIC
+AIC3 <- extractAIC(om3,k=2)[2]
+# AICc
+AICc3 <- extractAIC(om3,k=2)[2]+2*(p+2)*(p+3)/(n-p-1)
+# BIC
+BIC3 <- extractAIC(om3,k=log(n))[2]
+
+#### subset size = 4 ####
+p <- 4
+oms4 <- summary(om4)
+# AIC
+AIC4 <- extractAIC(om4,k=2)[2]
+# AICc
+AICc4 <- extractAIC(om4,k=2)[2]+2*(p+2)*(p+3)/(n-p-1)
+# BIC
+BIC4 <- extractAIC(om4,k=log(n))[2]
+
+#### subset size = 5 ####
+p <- 5
+oms5 <- summary(om5)
+# AIC
+AIC5 <- extractAIC(om5,k=2)[2]
+# AICc
+AICc5 <- extractAIC(om5,k=2)[2]+2*(p+2)*(p+3)/(n-p-1)
+# BIC
+BIC5 <- extractAIC(om5,k=log(n))[2]
+
+#### subset size = 6 ####
+p <- 6
+oms6 <- summary(om6)
+# AIC
+AIC6 <- extractAIC(om6,k=2)[2]
+# AICc
+AICc6 <- extractAIC(om6,k=2)[2]+2*(p+2)*(p+3)/(n-p-1)
+# BIC
+BIC6 <- extractAIC(om6,k=log(n))[2]
+
+## Answer
+AIC <- c(AIC1,AIC2,AIC3, AIC4, AIC5, AIC6)
+AICc <- c(AICc1, AICc2, AICc3, AICc4, AICc5, AICc6)
+BIC <- c(BIC1, BIC2, BIC3, BIC4, BIC5, BIC6)
+
+opmodel <- data.frame(Size=1:6, Radj2= Rad, AIC=AIC, AICc=AICc, BIC=BIC)
+opmodel
+#Lowest AIC, AICc, BIC values occur when size = 6. Thus, we are retaining all variables
+
+#Checking Forward Selection 
+
+add1(lm(Happy~1), Happy~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income, test="F")
+#Age seems to be insignificant
+
+#Performing another forward selection to see if age is actually insignificant
+add1(lm(Happy ~ JobSat.f), Happy~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income, test="F")
+
+#Backward Selection to see check the significance of variables
+drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income), test="F")
+
+#Ownhome seems to be insignificant
+drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household  + Income), test="F")
+```
+
+Our untransformed model thus contained JobSat, OwnHome, Marital and Household in factor form, as well as the numerical variables Income and Age. Its R squared value was 0.2844, and its adjusted R squared value improved to 0.2105. 
+```{r}
+Household.f <- factor(Household)
+
+Final_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household.f + Income + Age)
+summary(Final_model)
+```
+
+We used both the Box Cox and inverse response plot methods in transforming our model. Per Box Cox, we raised Age to the power of 0.226. Intuitively, looking at the relationship between Income and Happy, we decided on a logarithmic transformation on Income, as well. The adjusted R squared value reduced a little from this transformation, to 0.2099, and R squared dropped to 0.2838. Taking into account the inverse response plot function's suggestion - raising Happy to the power of -0.1130549 - improved the model a good amount - we obtained a value of 0.3116 for R squared and 0.2405 for adjusted R squared.
+```{r}
+
+#Box Cox transformation
+summary(powerTransform(cbind(JobSat.f, OwnHome.f, Marital.f, Household.f, Income, Age)~1))
+Age_transformed <- Age^0.226
+
+m_new <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
+summary(m_new)
+
+#Inverse response plot
+inverseResponsePlot(m_new, key=TRUE)
+
+m_new <- lm(Happy^-0.1130549 ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
+
+summary(m_new)
+```
+
+
+
+
+
+
+
+
+
+
+
