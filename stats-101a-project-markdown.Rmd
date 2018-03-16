@@ -127,6 +127,10 @@ plot(happiness_data$Happy ~ factor(happiness_data$Education))
 ```
 
 ```{r}
+#need to add in Ashwin's code here
+```
+
+```{r}
 #naren exploring full model with individual changes to variables and subsequent new models
 m10 <- lm(happiness_data$Happy ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income + factor(happiness_data$Sex) + happiness_data$Age)
 summary(m10)
