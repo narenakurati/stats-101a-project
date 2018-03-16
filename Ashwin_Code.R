@@ -290,8 +290,7 @@ summary(powerTransform(cbind(JobSat.f, OwnHome.f, Marital.f, Household, Income, 
 #Inverse response plot
 inverseResponsePlot(Final_model)
 
-Age_transformed <- Age^0.5
->>>>>>> a75f8ee33a2e68706241bb741c2a7129d9f15d52
+Age_transformed <- Age^0.226
 
 m_new <- lm(log(Happy) ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
 summary(m_new)
