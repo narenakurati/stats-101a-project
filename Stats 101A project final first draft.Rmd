@@ -8,7 +8,8 @@ output:
 ---
 
 We began by systematically cleaning the data. For each variable, our first step was consulting the codebook to decide which codes could be converted to NAs. We decided that "not answered" could in every case be classified as NA. We also converted the variables coded to denote "_ or more" to NAs as we felt those might skew our analysis. We did not convert 8 (8 or more) in Household or Children, and we converted 0 (Inapplicable) and 8 (Don't know) to 2 (No) in Instagram. With these new conditions, we repeated plotting the full model, carrying out more complete analyses on it this time. Its R squared value was 0.2811, with an adjusted R squared of 0.2069.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #data cleanup
 happiness_data <- read.table("Happiness.txt", header = TRUE)
 
@@ -61,14 +62,16 @@ happiness_data$Happy[happiness_data$Happy == 100] <- 3
 
 
 The first conclusion we came to in our model selection process was that WorkHrs could be excluded, as there were 1898 missing values, most of which were -1 (Inapplicable). While we weren't sure whether "Inapplicable" could be considered a missing value per se, there did not seem to be any way around categorizing it so, since we had decided to treat WorkHrs as a numerical variable. Its sheer amount of missing values made it ineligible for model fitting - every attempt to include it resulted in an error being thrown. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #Finding the number of NAs 
 sum(is.na(happiness_data$WorkHrs))
 #Insta = 10, Marital = 1; #Household = 1; #Health = 811; #OwnHome = 812; #JobSat = 1612; #WorkHrs = 1898; #Income = 1039
 ```
 
 We plotted the full model (without WorkHrs). This factored in around 190 observations, as the rest had NAs under some variables. We found the Residuals vs Fitted plot showed a decreasing linear trend, a result of some of the predictor variables being categorical. The standardized residual plot also showed a pattern that skewed the plot much more than it did in the Residuals vs. Fitted plot. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 attach(happiness_data)
 #Factoring Categorical Variables
 JobSat.f <- factor(JobSat); OwnHome.f <- factor(OwnHome); Marital.f <- factor(Marital); Instagram.f <- factor(Instagram); Health.f <- factor(Health)
@@ -81,7 +84,7 @@ full_model <- lm(Happy ~ Household + OwnHome.f + Instagram.f + Marital.f + Child
 ```
 
 We decided the best way to proceed would be to test each variable's significance individually. We correlated individual variables with Happy, finding that Instagram and Sex did not have statistically significant linear relationships to Happy.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 insta <- lm(Happy ~ Instagram)
 #summary(insta)
 #plot(insta)
@@ -109,7 +112,7 @@ sex <- lm(Happy ~ Sex)
 ```
 
 We then used partial F-tests to verify these findings, as well as potentially weed out other variables. To do so, we created models that each excluded one variable and then tested them against our full model. This method found Children and Education to be insignificant in addition to Instagram and Sex. OwnHome, JobSat, Income and Age threw errors in partial F-testing.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 noMarital <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Education + Age + Income + Children + Instagram.f)
 anova(full_model, noMarital)
 #Marital is Significant
@@ -153,7 +156,7 @@ anova(full_model, noEducation)
 
 
 After eliminating the four insignificant variables, we obtained AIC, AICc and BIC values, which were lowest when all six variables were included. Performing forward selection showed OwnHome to be insignificant and performing backward selection showed Age to be insignificant. Since the forward and backward selections were not in agreement, this did not seem like strong enough evidence to exclude the variables to us. We found including all 6 variables gave us the lowest values for each, so we did not choose to omit any variables from the model in this process. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #Eliminating education, instagram, children, sex
 new_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Income + Age)
 summary(new_model)
@@ -254,7 +257,7 @@ drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household  + Income), test="
 ```
 
 Our untransformed model thus contained JobSat, OwnHome, Marital and Household in factor form, as well as the numerical variables Income and Age. Its R squared value was 0.2844, and its adjusted R squared value improved to 0.2105. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
 Household.f <- factor(Household)
 
 Final_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household.f + Income + Age)
@@ -262,7 +265,7 @@ summary(Final_model)
 ```
 
 We used both the Box Cox and inverse response plot methods in transforming our model. Per Box Cox, we raised Age to the power of 0.226. Intuitively, looking at the relationship between Income and Happy, we decided on a logarithmic transformation on Income, as well. The adjusted R squared value reduced a little from this transformation, to 0.2099, and R squared dropped to 0.2838. The inverse response plot suggested a lambda of -0.1130549, but the RSS for a lambda of 0 was very similar, so we took the log transformation of our response variable instead, as it it represented a better representation of real world data. We ended with an $R^2$ value of 0.3092 and an adjusted $R^2$ of 0.2378.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #Box Cox transformation
 summary(powerTransform(cbind(JobSat.f, OwnHome.f, Marital.f, Household.f, Income, Age)~1))
 Age_transformed <- Age^0.226
