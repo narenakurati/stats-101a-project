@@ -1,7 +1,7 @@
 ---
-title: 'Stats 101A project: final first draft'
-author: "Simran Vatsa"
-date: "3/15/2018"
+title: 'Stats 101A Project: Final First Draft'
+author: "Simran Vatsa, Naren Akurati, Sohom Paul, Ashwin Ayyasamy, Jeremy Phan"
+date: "3/16/2018"
 output:
   pdf_document: default
   html_document: default
