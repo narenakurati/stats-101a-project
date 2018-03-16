@@ -270,10 +270,16 @@ drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household  + Income), test="
 #No strong evidence to drop Age and OwnHome though! The forward and Backward selections don't seem to agree!
 ######################################
 
-Final_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Income + Age)
+Household.f <- factor(Household)
+
+Final_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household.f + Income + Age)
+
+#Box Cox transformation
 summary(powerTransform(cbind(JobSat.f, OwnHome.f, Marital.f, Household, Income, Age)~1))
 
-Household.f <- factor(Household)
+#Inverse response plot
+inverseResponsePlot(Final_model)
+
 Age_transformed <- Age^0.5
 
 m_new <- lm(log(Happy) ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
