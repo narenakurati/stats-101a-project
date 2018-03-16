@@ -273,6 +273,7 @@ drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household  + Income), test="
 Final_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Income + Age)
 
 Household.f <- factor(Household)
+Age_transformed <- Age^0.5
 
 m_new <- lm(log(Happy) ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
 summary(m_new)
