@@ -10,9 +10,7 @@ output:
 We began by systematically cleaning the data. For each variable, our first step was consulting the codebook to decide which codes could be converted to NAs. We decided that "not answered" could in every case be classified as NA. We also converted the variables coded to denote "_ or more" to NAs as we felt those might skew our analysis. We did not convert 8 (8 or more) in Household or Children, and we converted 0 (Inapplicable) and 8 (Don't know) to 2 (No) in Instagram. With these new conditions, we repeated plotting the full model, carrying out more complete analyses on it this time. Its R squared value was 0.2811, with an adjusted R squared of 0.2069.
 ````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #data cleanup
-getwd()
 happiness_data <- read.table("Happiness.txt", header = TRUE)
-head(happiness_data)
 
 #Household
 happiness_data$Household[happiness_data$Household == 9] <- NA
@@ -66,13 +64,7 @@ The first conclusion we came to in our model selection process was that WorkHrs 
 ````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #Finding the number of NAs 
 sum(is.na(happiness_data$WorkHrs))
-#Insta = 10, Marital = 1
-#Household = 1
-#Health = 811
-#OwnHome = 812
-#JobSat = 1612 
-#WorkHrs = 1898 
-#Income = 1039
+#Insta = 10, Marital = 1; #Household = 1; #Health = 811; #OwnHome = 812; #JobSat = 1612; #WorkHrs = 1898; #Income = 1039
 ```
 
 We plotted the full model (without WorkHrs). This factored in around 190 observations, as the rest had NAs under some variables. We found the Residuals vs Fitted plot showed a decreasing linear trend, a result of some of the predictor variables being categorical. The standardized residual plot also showed a pattern that skewed the plot much more than it did in the Residuals vs. Fitted plot. 
