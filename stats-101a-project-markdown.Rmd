@@ -143,6 +143,12 @@ inverse.response.plot(m11,key=TRUE)
 #adding in inverse response plot lambda and after removing
 m12 <- lm((happiness_data$Happy)^-0.1808482 ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + factor(happiness_data$Marital) + factor(happiness_data$JobSat) + happiness_data$Age + log(happiness_data$Income))
 summary(m12)
+
+#with ashiwns updates
+age_transform <- (happiness_data$Age)^0.226
+m13 <- lm((happiness_data$Happy)^-0.1130549 ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + factor(happiness_data$Marital) + factor(happiness_data$JobSat) + age_transform + log(happiness_data$Income))
+summary(m13)
+plot(m13)
 ```
 
 ```{r}

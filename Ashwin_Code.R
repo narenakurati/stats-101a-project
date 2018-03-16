@@ -297,3 +297,4 @@ summary(m_new)
 summary(m_new_log)
 
 plot(m_new)
+plot(m_new_log)
