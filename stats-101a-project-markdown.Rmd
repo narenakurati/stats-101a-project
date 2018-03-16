@@ -142,5 +142,9 @@ summary(m12)
 ```
 
 ```{r}
+#naren testing with means of categorical variables
+```
+
+```{r}
 #jeremy commits again
 ```
