@@ -7,65 +7,7 @@ output:
   html_document: default
 ---
 
-We began by systematically cleaning the data. For each variable, our first step was consulting the codebook to decide which codes could be converted to NAs. We decided that "not answered" could in every case be classified as NA. However, we were less sure about "Don't know" and "Inapplicable", but in our first iteration of data cleaning, we converted those to NAs too in order to simplify the task at hand and move on to exploratory analysis. We also converted the variables coded to denote "_ or more" to NAs as we felt those might skew our analysis.
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-#data cleanup
-happiness_data <- read.table("Happiness.txt", header = TRUE)
-
-happiness_data$Household[happiness_data$Household == 8 | happiness_data$Household == 9] <- NA
-
-happiness_data$Health[happiness_data$Health == 8 | happiness_data$Health == 9 |  happiness_data$Health == 0] <- NA
-happiness_data$Health[happiness_data$Health == 1] <- 400
-happiness_data$Health[happiness_data$Health == 2] <- 300
-happiness_data$Health[happiness_data$Health == 3] <- 2
-happiness_data$Health[happiness_data$Health == 4] <- 1
-happiness_data$Health[happiness_data$Health == 400] <- 4
-happiness_data$Health[happiness_data$Health == 300] <- 3
-
-happiness_data$OwnHome[happiness_data$OwnHome == 0 | happiness_data$OwnHome == 8 | happiness_data$OwnHome == 9] <- NA
-
-happiness_data$Instagram[happiness_data$Instagram == 0 | happiness_data$Instagram == 8 | happiness_data$Instagram == 9] <- NA
-
-happiness_data$Marital[happiness_data$Marital == 9] <- NA
-
-happiness_data$Age[happiness_data$Age == 89 | happiness_data$Age == 98 | happiness_data$Age == 99] <- NA
-
-happiness_data$Children[happiness_data$Children == 8 | happiness_data$Children == 9] <- NA
-
-happiness_data$Education[happiness_data$Education == 97 | happiness_data$Education == 98 | happiness_data$Education == 99] <- NA
-
-happiness_data$JobSat[happiness_data$JobSat == 0 | happiness_data$JobSat == 8 | happiness_data$JobSat == 9] <- NA
-
-happiness_data$Income[happiness_data$Income == 0 | happiness_data$Income == 999998 | happiness_data$Income == 999999] <- NA
-
-happiness_data$WorkHrs[happiness_data$WorkHrs == -1 | happiness_data$WorkHrs == 998 | happiness_data$WorkHrs == 999] <- NA
-
-happiness_data$Happy[happiness_data$Happy == 0 | happiness_data$Happy == 8 | happiness_data$Happy == 9] <- NA
-
-happiness_data$Happy[happiness_data$Happy == 1] <- 100
-happiness_data$Happy[happiness_data$Happy == 3] <- 1
-happiness_data$Happy[happiness_data$Happy == 100] <- 3
-```
-
-In exploring the data, we began with a scatterplot, which was not at all informative. We then split the variables into numerical and categorical and decided to analyze each group separately. Our numerical variables were Age, Education, Income and WorkHrs; we considered the rest as categorical and converted them into factors in order to build models with them. We put all our numerical variables into a model with Happy, obtaining an unsatisfactory R squared value of 0.017. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-#exploring data
-pairs(happiness_data[, -c(1,2,3,4,5,6,8,10)], gap=0.4,cex.labels=1.5)
-m1 <- lm(happiness_data$Happy ~ happiness_data$Age + happiness_data$Education + happiness_data$Income + happiness_data$WorkHrs)
-summary(m1)
-```
-
-Then, we created a model with all predictors against Happy, with the categorical variables in factor form. We used an inverse response plot on the model, just to see how high of an R squared value we could get to obtain an estimate of what to aim for. This gave us an R squared value of around 0.303, probably from overfitting; the adjusted R squared was 0.2235. 
-````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-library(alr3)
-m1 <- lm(happiness_data$Happy ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
-inverse.response.plot(m1,key=TRUE)
-
-m2 <- lm((happiness_data$Happy)^0.396 ~ factor(happiness_data$Household) + factor(happiness_data$OwnHome) + happiness_data$Instagram + factor(happiness_data$Marital) + happiness_data$Children + happiness_data$Education + factor(happiness_data$JobSat) + happiness_data$Income)
-summary(m2)
-```
-
-At this stage, after getting comfortable with the data, we decided to make some modifications to how we selected codes to turn into NAs; we did not convert 8 (8 or more) in Household or Children, and we converted 0 (Inapplicable) and 8 (Don't know) to 2 (No) in Instagram. With these new conditions, we repeated plotting the full model, carrying out more complete analyses on it this time. Its R squared value was 0.2811, with an adjusted R squared of 0.2069.
+We began by systematically cleaning the data. For each variable, our first step was consulting the codebook to decide which codes could be converted to NAs. We decided that "not answered" could in every case be classified as NA. We also converted the variables coded to denote "_ or more" to NAs as we felt those might skew our analysis. We did not convert 8 (8 or more) in Household or Children, and we converted 0 (Inapplicable) and 8 (Don't know) to 2 (No) in Instagram. With these new conditions, we repeated plotting the full model, carrying out more complete analyses on it this time. Its R squared value was 0.2811, with an adjusted R squared of 0.2069.
 ````{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #data cleanup
 getwd()
