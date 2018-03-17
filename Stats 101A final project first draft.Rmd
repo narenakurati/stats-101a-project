@@ -12,9 +12,7 @@ We began by systematically cleaning the data. For each variable, our first step 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #data cleanup
 happiness_data <- read.table("Happiness.txt", header = TRUE)
-#Household
 happiness_data$Household[happiness_data$Household == 9] <- NA
-#Health
 happiness_data$Health[happiness_data$Health == 8 | happiness_data$Health == 9 |  happiness_data$Health == 0] <- NA
 happiness_data$Health[happiness_data$Health == 1] <- 400
 happiness_data$Health[happiness_data$Health == 2] <- 300
@@ -22,26 +20,17 @@ happiness_data$Health[happiness_data$Health == 3] <- 2
 happiness_data$Health[happiness_data$Health == 4] <- 1
 happiness_data$Health[happiness_data$Health == 400] <- 4
 happiness_data$Health[happiness_data$Health == 300] <- 3
-#OwnHome
 happiness_data$OwnHome[happiness_data$OwnHome == 0 | happiness_data$OwnHome == 8 | happiness_data$OwnHome == 9] <- NA
 #Instagram - Set 'don't know' and 'inapplicable' to 'No'
 happiness_data$Instagram[happiness_data$Instagram == 0 | happiness_data$Instagram == 8] <- 2
 happiness_data$Instagram[happiness_data$Instagram == 9] <- NA
-#Marital
 happiness_data$Marital[happiness_data$Marital == 9] <- NA
-#Age
 happiness_data$Age[happiness_data$Age == 89 | happiness_data$Age == 98 | happiness_data$Age == 99] <- NA
-#Children
 happiness_data$Children[happiness_data$Children == 9] <- NA
-#Education
 happiness_data$Education[happiness_data$Education == 97 | happiness_data$Education == 98 | happiness_data$Education == 99] <- NA
-#JobSat
 happiness_data$JobSat[happiness_data$JobSat == 0 | happiness_data$JobSat == 8 | happiness_data$JobSat == 9] <- NA
-#Income
 happiness_data$Income[happiness_data$Income == 0 | happiness_data$Income == 999998 | happiness_data$Income == 999999] <- NA
-#WorkHrs
 happiness_data$WorkHrs[happiness_data$WorkHrs == -1 | happiness_data$WorkHrs == 998 | happiness_data$WorkHrs == 999] <- NA
-#Happy
 happiness_data$Happy[happiness_data$Happy == 0 | happiness_data$Happy == 8 | happiness_data$Happy == 9] <- NA
 happiness_data$Happy[happiness_data$Happy == 1] <- 100
 happiness_data$Happy[happiness_data$Happy == 3] <- 1
@@ -57,7 +46,7 @@ sum(is.na(happiness_data$WorkHrs))
 #Insta = 10, Marital = 1; #Household = 1; #Health = 811; #OwnHome = 812; #JobSat = 1612; #WorkHrs = 1898; #Income = 1039
 ```
 
-We plotted the full model (without WorkHrs). This factored in around 190 observations, as the rest had NAs under some variables. We found the Residuals vs Fitted plot showed a decreasing linear trend, a result of some of the predictor variables being categorical. The standardized residual plot also showed a pattern that skewed the plot much more than it did in the Residuals vs. Fitted plot. 
+We plotted the full model (without WorkHrs). This factored in around 190 observations, as all the rest had NAs under some variables. We found the Residuals vs Fitted plot showed a decreasing linear trend, a result of some of the predictor variables being categorical. The standardized residual plot also showed a pattern that skewed the plot much more than it did in the Residuals vs. Fitted plot. 
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 attach(happiness_data)
@@ -126,49 +115,38 @@ om4 <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household)
 om5 <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Age)
 om6 <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income)
 n = length(Happy)
-#### subset size = 1 ####
+
 p <- 1
 oms1 <- summary(om1)
 AIC1 <- extractAIC(om1,k=2)[2] # AIC
 AICc1 <- extractAIC(om1,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
 BIC1 <- extractAIC(om1,k=log(n))[2] # BIC
- 
-#### subset size = 2 ####
 p <- 2
 oms2 <- summary(om2)
 AIC2 <- extractAIC(om2,k=2)[2] # AIC
 AICc2 <- extractAIC(om2,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
 BIC2 <- extractAIC(om2,k=log(n))[2] # BIC
-
-#### subset size = 3 ####
 p <- 3
 oms3 <- summary(om3)
 AIC3 <- extractAIC(om3,k=2)[2] # AIC
 AICc3 <- extractAIC(om3,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
 BIC3 <- extractAIC(om3,k=log(n))[2] # BIC
-
-#### subset size = 4 ####
 p <- 4
 oms4 <- summary(om4)
 AIC4 <- extractAIC(om4,k=2)[2] # AIC
 AICc4 <- extractAIC(om4,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
 BIC4 <- extractAIC(om4,k=log(n))[2] # BIC
-
-#### subset size = 5 ####
 p <- 5
 oms5 <- summary(om5)
 AIC5 <- extractAIC(om5,k=2)[2] # AIC
 AICc5 <- extractAIC(om5,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
 BIC5 <- extractAIC(om5,k=log(n))[2] # BIC
-
-#### subset size = 6 ####
 p <- 6
 oms6 <- summary(om6)
 AIC6 <- extractAIC(om6,k=2)[2] # AIC
 AICc6 <- extractAIC(om6,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
 BIC6 <- extractAIC(om6,k=log(n))[2] # BIC
 
-## Answer
 AIC <- c(AIC1,AIC2,AIC3, AIC4, AIC5, AIC6)
 AICc <- c(AICc1, AICc2, AICc3, AICc4, AICc5, AICc6)
 BIC <- c(BIC1, BIC2, BIC3, BIC4, BIC5, BIC6)
@@ -179,18 +157,19 @@ opmodel
 
 #Checking Forward Selection 
 
-add1(lm(Happy~1), Happy~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income, test="F") 
+add1(lm(Happy~1), Happy~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income, test="F")$`Pr(>F)` #prints p-value
 #Age seems to be insignificant
+
 #Performing another forward selection to see if age is actually insignificant
-add1(lm(Happy ~ JobSat.f), Happy~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income, test="F")
+add1(lm(Happy ~ JobSat.f), Happy~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income, test="F")$`Pr(>F)` #prints p-value
 #Backward Selection to see check the significance of variables
-drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income), test="F")
+drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household + Age + Income), test="F")$`Pr(>F)` #prints p-value
 #Ownhome seems to be insignificant
-drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household  + Income), test="F")
+drop1(lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household  + Income), test="F")$`Pr(>F)` #prints p-value
 ```
 
 Our untransformed model thus contained JobSat, OwnHome, Marital and Household in factor form, as well as the numerical variables Income and Age. Its R squared value was 0.2844, and its adjusted R squared value improved to 0.2105. 
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 Household.f <- factor(Household)
 
 Final_model <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household.f + Income + Age)
@@ -201,14 +180,13 @@ summary(Final_model)$adj.r.squared
 We used both the Box Cox and inverse response plot methods in transforming our model. Per Box Cox, we raised Age to the power of 0.226. Intuitively, looking at the relationship between Income and Happy, we decided on a logarithmic transformation on Income, as well. The adjusted R squared value reduced a little from this transformation, to 0.2099, and R squared dropped to 0.2838. The inverse response plot suggested a lambda of -0.1130549, but the RSS for a lambda of 0 was very similar, so we took the log transformation of our response variable instead, as it it represented a better representation of real world data. We ended with an $R^2$ value of 0.3092 and an adjusted $R^2$ of 0.2378.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #Box Cox transformation
-summary(powerTransform(cbind(JobSat.f, OwnHome.f, Marital.f, Household.f, Income, Age)~1))
+powerTransform(cbind(JobSat.f, OwnHome.f, Marital.f, Household.f, Income, Age)~1)
 Age_transformed <- Age^0.226
 m_new <- lm(Happy ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
 #summary(m_new)
 
 #Inverse response plot
 par(mfrow=c(2,2))
-inverseResponsePlot(m_new, key=TRUE)
 m_new <- lm(log(Happy) ~ JobSat.f + OwnHome.f + Marital.f + Household.f + log(Income) + Age_transformed)
 summary(m_new)
 ```
