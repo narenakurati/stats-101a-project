@@ -1,5 +1,5 @@
 ---
-title: 'Stats 101A Project: Final First Draft'
+title: 'Stats 101A Project: Group Project First Draft'
 author: "Simran Vatsa, Naren Akurati, Sohom Paul, Ashwin Ayyasamy, Jeremy Phan"
 date: "3/16/2018"
 output:
@@ -58,35 +58,23 @@ We decided the best way to proceed would be to test each variable's significance
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 insta <- lm(Happy ~ Instagram)
 #summary(insta); plot(insta); Instagram is insignificant
-marital <- lm(Happy ~ Marital.f)
-#summary(marital); plot(marital); Marital is significant
-Job <- lm(Happy ~ JobSat.f)
-#summary(Job); plot(Job); Job is significant
-House <- lm(happiness_data$Happy ~ happiness_data$Household)
-#summary(House); plot(Household); Household is significant
 sex <- lm(Happy ~ Sex)
 #summary(sex); plot(sex); Sex is insignificant
 ```
 
 We then used partial F-tests to verify these findings, as well as potentially weed out other variables. To do so, we created models that each excluded one variable and then tested them against our full model. This method found Children and Education to be insignificant in addition to Instagram and Sex. OwnHome, JobSat, Income and Age threw errors in partial F-testing, so we have not included the code for those.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-noMarital <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Education + Age + Income + Children + Instagram.f)
-anova(full_model, noMarital)$`Pr(>F)` 
+noMarital <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Education + Age + Income + Children + Instagram.f); anova(full_model, noMarital)$`Pr(>F)` 
 #Marital is significant
-noHousehold <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Marital.f + Education + Age + Income + Children + Instagram.f)
-anova(full_model, noHousehold)$`Pr(>F)`
+noHousehold <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Marital.f + Education + Age + Income + Children + Instagram.f); anova(full_model, noHousehold)$`Pr(>F)`
 #Household is significant
-noSex <- lm(Happy ~ JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Children + Instagram.f)
-anova(full_model, noSex)$`Pr(>F)`
+noSex <- lm(Happy ~ JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Children + Instagram.f); anova(full_model, noSex)$`Pr(>F)`
 #Sex is insignificant
-noInstagram <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Children)
-anova(full_model, noInstagram)$`Pr(>F)`
+noInstagram <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Children); anova(full_model, noInstagram)$`Pr(>F)`
 #Instagram is insignificant
-noChildren <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Instagram.f)
-anova(full_model, noChildren)$`Pr(>F)`
+noChildren <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Education + Age + Income + Instagram.f); anova(full_model, noChildren)$`Pr(>F)`
 #Children is insignificant
-noEducation <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Age + Income + Children + Instagram.f)
-anova(full_model, noEducation)$`Pr(>F)`
+noEducation <- lm(Happy ~ Sex + JobSat.f + OwnHome.f + Household + Marital.f + Age + Income + Children + Instagram.f); anova(full_model, noEducation)$`Pr(>F)`
 #Education is insignificant
 ```
 
