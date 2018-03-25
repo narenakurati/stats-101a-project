@@ -1,0 +1,199 @@
+---
+title: 'Stats 101A Project'
+author: "Naren Akurati, Simran Vatsa, Ashwin Ayyasamy, Sohom Paul, Jeremy Phan"
+date: "3/23/2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+##Introduction
+* In this study, we are looking to create a model to predict *Happiness*. We have variables *Household*, *Health*, *OwnHome*, *Instagram*, *Marital*, *Sex*, *Age*, *Children*, *Education*, *JobSat*, *Income*, and *WorkHrs*. By finding a viable model, we could be able to use it for increasing happiness in a variety of fields and applications from academic settings to social welfare.
+
+* We will first clean the data, take a high-level look at it, transform our predictors, and then remove insignificant variables. We expect to encounter problems with the data along the way, as this is a social sciences data set, and observations are not being dialed in by a computer and could be susceptible to human error.
+
+##Data Cleanup
+Consulted codebook to decide which codes could be converted to NAs. Changed "not answered" to NA, as that is information we do not have. Also converted variables coded to denote "_ or more" to NAs, as that is information we do not have and cannot create. We did not convert 8 (8 or more) in Household or Children, and we converted 0 (Inapplicable) and 8 (Don't know) to 2 (No) in Instagram.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo=FALSE}
+library(alr3)
+#data cleanup
+happiness_data <- read.table("Happiness.txt", header = TRUE)
+happiness_data$Household[happiness_data$Household == 9] <- NA
+happiness_data$Health[happiness_data$Health == 8 | happiness_data$Health == 9 |  happiness_data$Health == 0] <- NA
+happiness_data$Health[happiness_data$Health == 1] <- 400
+happiness_data$Health[happiness_data$Health == 2] <- 300
+happiness_data$Health[happiness_data$Health == 3] <- 2
+happiness_data$Health[happiness_data$Health == 4] <- 1
+happiness_data$Health[happiness_data$Health == 400] <- 4
+happiness_data$Health[happiness_data$Health == 300] <- 3
+happiness_data$OwnHome[happiness_data$OwnHome == 0 | happiness_data$OwnHome == 8 | happiness_data$OwnHome == 9] <- NA
+#Instagram - Set 'don't know' and 'inapplicable' to 'No'
+happiness_data$Instagram[happiness_data$Instagram == 0 | happiness_data$Instagram == 8] <- 2
+happiness_data$Instagram[happiness_data$Instagram == 9] <- NA
+happiness_data$Marital[happiness_data$Marital == 9] <- NA
+happiness_data$Age[happiness_data$Age == 89 | happiness_data$Age == 98 | happiness_data$Age == 99] <- NA
+happiness_data$Children[happiness_data$Children == 9] <- NA
+happiness_data$Education[happiness_data$Education == 97 | happiness_data$Education == 98 | happiness_data$Education == 99] <- NA
+happiness_data$JobSat[happiness_data$JobSat == 0 | happiness_data$JobSat == 8 | happiness_data$JobSat == 9] <- NA
+happiness_data$Income[happiness_data$Income == 0 | happiness_data$Income == 999998 | happiness_data$Income == 999999] <- NA
+happiness_data$WorkHrs[happiness_data$WorkHrs == -1 | happiness_data$WorkHrs == 998 | happiness_data$WorkHrs == 999] <- NA
+happiness_data$Happy[happiness_data$Happy == 0 | happiness_data$Happy == 8 | happiness_data$Happy == 9] <- NA
+happiness_data$Happy[happiness_data$Happy == 1] <- 100
+happiness_data$Happy[happiness_data$Happy == 3] <- 1
+happiness_data$Happy[happiness_data$Happy == 100] <- 3
+```
+
+##First Model
+We start with the full model with everything except *Health* and *WorkHrs* predictors. *Health* and *WorkHrs* predictors throw errors due to large number of NAs (811 and 1898 NAs respectively) and few categories. $R^2$ currently at 0.2811438 and $R^2_{adj}$ at 0.2069141.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+attach(happiness_data)
+JobSat.f <- factor(JobSat); OwnHome.f <- factor(OwnHome); Marital.f <- factor(Marital); Instagram.f <- factor(Instagram); Health.f <- factor(Health); Household.f <- factor(Household); Children.f <- factor(Children); Sex.f <- factor(Sex)
+
+full_model <- lm(Happy ~ Household.f + OwnHome.f + Instagram.f + Marital.f + Children.f + Education + JobSat.f + Income + Age + Sex.f)
+
+sum(is.na(Health))
+sum(is.na(WorkHrs))
+
+summary(full_model)$r.squared
+summary(full_model)$adj.r.squared
+```
+
+```{r}
+#pairs(happiness_data, gap=0.4, cex.labels=1.5)
+```
+
+##Transformation
+Transformation of numerical variables *Education*, *Income*, and *Age* using powertransform. Understanding of the effects of wealth lead us to use log transformation of *Income* predictor which proved more effective than the estimated transformation parameter. Inverse rseponse plot suggested lambda close to 0. As such, we took log(*Happy*) for a simpler model. $R^2$ currently at 0.3518696 and $R^2_{adj}$ at 0.2438479.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+#Power transformation
+powerTransform(cbind(Household.f, OwnHome.f, Instagram.f, Marital.f, Children.f, Education, JobSat.f, Income, Age, Sex.f)~1)
+
+Education_transformed <- Education^0.7943619
+Income_transformed <- Income^0.2140292
+Income_log <- log(Income)
+Age_transformed <- Age^0.3192108
+
+full_model_transform_log <- lm(Happy ~ Household.f + OwnHome.f + Instagram.f + Marital.f + Children.f + Education_transformed + JobSat.f + Income_log  + Age_transformed + Sex.f)
+
+summary(full_model_transform_log)$r.squared
+summary(full_model_transform_log)$adj.r.squared
+
+#Inverse response plot
+par(mfrow=c(2,1))
+inverseResponsePlot(full_model_transform_log, key = TRUE)
+
+full_model_transform_log_inverse_response <- lm(log(Happy) ~ Household.f + OwnHome.f + Instagram.f + Marital.f + Children.f + Education_transformed + JobSat.f + Income_log  + Age_transformed + Sex.f)
+
+summary(full_model_transform_log_inverse_response)$r.squared
+summary(full_model_transform_log_inverse_response)$adj.r.squared
+```
+
+##Cursory Variable Selection
+We look at number of NAs in our predictors. *OwnHome*, *JobSat*, and *Income* all have a high number of NAs (812, 1612, and 1039 respectively). From summary, predictors showing p-values over 0.05 are *OwnHome*, *Instagram*, *Marital*, *Children*, *Education*, and *Age*. These may need to be removed.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+df_NA_count <- data.frame(c(sum(is.na(Household.f)), sum(is.na(OwnHome.f)), sum(is.na(Instagram.f)), sum(is.na(Marital.f)), sum(is.na(Children.f)), sum(is.na(Education_transformed)), sum(is.na(JobSat.f)), sum(is.na(Income_log)), sum(is.na(Age_transformed)), sum(is.na(Sex.f))))
+```
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
+#summary(full_model_transform_log_inverse_response)
+```
+
+##Single F-test - Further Variable Selection
+We start with manual F-tests based on backward selection (removing the least significant variables first each iteration). We remove all insigificant variables (*Instagram*, *Children*, *OwnHome*, *Sex*, *Age*, and *Education*). Our $R^2$ and $R^2_{adj}$ values dropped significantly to 0.170019 and 0.1463052 respectively, but we do this in order to avoid overfitting the data.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+full <- drop1(full_model_transform_log_inverse_response, test = "F")
+reduced_1 <- drop1(update(full_model_transform_log_inverse_response, ~ . -Instagram.f), test = "F")
+reduced_2 <- drop1(update(full_model_transform_log_inverse_response, ~ . -Instagram.f -Children.f), test = "F")
+reduced_3 <- drop1(update(full_model_transform_log_inverse_response, ~ . -Instagram.f -Children.f -OwnHome.f), test = "F")
+reduced_4 <- drop1(update(full_model_transform_log_inverse_response, ~ . -Instagram.f -Children.f -OwnHome.f -Sex.f), test = "F")
+reduced_5 <- drop1(update(full_model_transform_log_inverse_response, ~ . -Instagram.f -Children.f -OwnHome.f -Sex.f -Age_transformed), test = "F")
+reduced_6 <- drop1(update(full_model_transform_log_inverse_response, ~ . -Instagram.f -Children.f -OwnHome.f -Sex.f -Age_transformed -Education_transformed), test = "F")
+```
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+updated_model <- lm(log(Happy) ~ Household.f + Marital.f + JobSat.f + Income_log)
+
+summary(updated_model)$r.squared
+summary(updated_model)$adj.r.squared
+```
+
+##AIC, AICc, BIC
+AIC, AICc, and BIC subsets show a subset of size 2 to be optimal. However, doing so drops our $R^2$ and $R^2_{adj}$ significantly and cuts our number of predictors drastically. We choose not to implement the subset of size 2.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60), echo = FALSE}
+om1 <- lm(Happy ~ Household.f)
+om2 <- lm(Happy ~ Household.f + Marital.f)
+om3 <- lm(Happy ~ Household.f + Marital.f + JobSat.f)
+om4 <- lm(Happy ~ Household.f + Marital.f + JobSat.f + Income_log)
+n = length(om1$residuals)
+
+p <- 1
+AIC1 <- extractAIC(om1,k=2)[2] # AIC
+AICc1 <- extractAIC(om1,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
+BIC1 <- extractAIC(om1,k=log(n))[2] # BIC
+p <- 2
+AIC2 <- extractAIC(om2,k=2)[2] # AIC
+AICc2 <- extractAIC(om2,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
+BIC2 <- extractAIC(om2,k=log(n))[2] # BIC
+p <- 3
+AIC3 <- extractAIC(om3,k=2)[2] # AIC
+AICc3 <- extractAIC(om3,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
+BIC3 <- extractAIC(om3,k=log(n))[2] # BIC
+p <- 4
+AIC4 <- extractAIC(om4,k=2)[2] # AIC
+AICc4 <- extractAIC(om4,k=2)[2]+2*(p+2)*(p+3)/(n-p-1) # AICc
+BIC4 <- extractAIC(om4,k=log(n))[2] # BIC
+
+AIC <- c(AIC1,AIC2,AIC3, AIC4)
+AICc <- c(AICc1, AICc2, AICc3, AICc4)
+BIC <- c(BIC1, BIC2, BIC3, BIC4)
+
+opmodel <- data.frame(Size=1:4, AIC=AIC, AICc=AICc, BIC=BIC)
+opmodel
+```
+
+##Leverages, Outliers, and Influential Points
+Now we see how many bad leverage points we have. We have 22 bad leverage points. Amongst 600 social sciences observations, this is reasonable due to human error. We conclude that our final model is accurate.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+StanRes1 <- rstandard(updated_model); leverage1 <- hatvalues(updated_model); cookd1 <- cooks.distance(updated_model); p <- 4; n <- 600
+
+a <- which(StanRes1 > 2 | StanRes1 < - 2); b <- which(leverage1 > 2*(p+1)/n)
+intersect(a, b)
+```
+
+##Final Model and Conclusion
+* Steps we took: data clean up, look at full pairs() plots, transformation of predictors, cursory variable selection where we looked at our predictors from a broad view, F-testing / variable selection where we looked at p-values to select our predictors, AIC, AICc, BIC looking at all possible sets, and finally looking at any bad leverage points.
+
+* Our final model contains 4 of the 12 possible predictors we began with, 3 categorical and 1 numerical. For each categorical value included, at least one level is significant, justifying all their inclusions. The $R^2$ and $R^2_{adj}$ values we obtained are quite low, as is typical in social science data.
+Our model thus states that the key determining factors for an individual's happiness are their marital status, job satisfaction, income and to an extent, the number of members in their household, particularly for a household of only two members. 
+
+
+* We found that the $R^2$ value is not everything in data analysis and regression. There are so many other factors to look out for, and sometimes sacrificing a high $R^2$ value for a more statistically sound model is the correct way to go.
+
+
+* The model makes sense in the real world. For example one of the predictors we found to be very accurate is *Income* after we applied a log transformation to it to increase its predicting power. We see through numerous studies and articles that wealth has diminishing returns on happiness (for example: https://www.cnbc.com/2015/12/14/money-can-buy-happiness-but-only-to-a-point.html). The fact that *Income* responded better to our model after a log transformation was very interesting. We found a large income difference between those at the low and middle happiness levels, but a much smaller one between those at the middle and high happiness levels, implying the effect of income on happiness plateaus. A well-publicized study, conducted by Princeton University professors and Economics Nobel Prize winners Angus Deaton and Daniel Kahneman, found that "while life evaluation rose steadily with annual income, the quality of the respondents’ everyday experiences did not improve beyond approximately $75,000 a year." At incomes lower than this value, respondents reported increased sadness and stress, and lower happiness levels (http://wws.princeton.edu/news-and-events/news/item/two-wws-professors-release-new-study-income%E2%80%99s-influence-happiness).
+
+
+* One of the big limitation of the analysis we believe is caused by the vast amount of missing data which ultimately reduced what we had to work with. Variables like *Health* and *WorkHrs* did not work with the model, because of how many NAs they had (811 and 1898 NAs respectively). We felt it was not right to tamper with the original data. However, in the future, a way to salvage some of our variables is to input the mean value of the column in position of all the NA entries. This will make the variable still usable but might breach ethical practices of the social science data.
+
+* Our analysis is limited in that it only uses 4 predictors. Happiness is a human emotion; it is thus complicated and certainly cannot be definitively predicted by 4 factors, or even 12, for that matter. This is part of why $R^2$ and $R^2_{adj}$ values are low in social sciences; human behavior is immensely difficult to predict.
+
+
+```{r}
+summary(updated_model)
+```
+
+##Appendix
+```{r, warning = FALSE}
+par(mfrow=c(2,2))
+plot(updated_model)
+```
+
+
+
+
+
+
+
+
+
+
+
